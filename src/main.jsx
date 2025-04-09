@@ -6,6 +6,8 @@ import ReactDOM from 'react-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Addjob from './components/Addjob';
 import JobDetailsModal from './components/JobDetailsModal';
+import Jobcard from './components/Jobcard';
+import JobsTable from './components/JobsTable';
 
 
 const routes = createBrowserRouter([
@@ -20,6 +22,14 @@ const routes = createBrowserRouter([
   {
     path: '/jobdetails',
     element: <JobDetailsModal />,
+  },
+  {
+    path: '/jobcard',
+    element: <Jobcard />,
+  },
+  {
+    path: '/jobtable',
+    element: <JobsTable />,
   },
 ]);
 
