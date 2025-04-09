@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,67 +10,82 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Search, Filter, X } from "lucide-react"
+import { Search, X } from "lucide-react"
 import JobDetailsModal from './JobDetailsModal'
+import { Skeleton } from "@/components/ui/skeleton"
+import { fetchJobs, fetchCategories } from "@/components/services/api"
 
 function Jobcard() {
   const [filters, setFilters] = useState({
     search: '',
     jobType: 'All',
     category: 'All',
-    remoteOnly: false
+    remoteOnly: true
   })
 
-  const jobs = [
-    {
-      id: 1,
-      title: "Senior React Developer",
-      company: "TechCorp Inc.",
-      type: "Full-time",
-      location: "Remote",
-      category: "Technology"
-    },
-    {
-      id: 2,
-      title: "Marketing Manager",
-      company: "Creative Solutions",
-      type: "Part-time",
-      location: "New York, NY",
-      category: "Marketing"
-    },
-    {
-      id: 3,
-      title: "Data Scientist",
-      company: "Analytics Pro",
-      type: "Contract",
-      location: "San Francisco, CA",
-      category: "Technology"
-    },
-    // Add more jobs...
-  ]
+  const [jobs, setJobs] = useState([])
+  const [categories, setCategories] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const jobTypes = ["All", "Full-time", "Part-time", "Contract", "Internship"]
-  const categories = ["All", "Technology", "Marketing", "Healthcare", "Finance", "Other"]
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      
+      try {
+        // Use the API service functions
+        const jobsData = await fetchJobs({
+          limit: 21,
+          ...(filters.search && { search: filters.search }),
+          ...(filters.category !== 'All' && { category: filters.category.toLowerCase() })
+        })
+        setJobs(jobsData.jobs)
 
-  // Filter jobs based on active filters
-  const filteredJobs = jobs.filter(job => {
-    return (
-      (filters.search === '' || 
-       job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-       job.company.toLowerCase().includes(filters.search.toLowerCase())) &&
-      (filters.jobType === 'All' || job.type === filters.jobType) &&
-      (filters.category === 'All' || job.category === filters.category) &&
-      (!filters.remoteOnly || job.location.toLowerCase().includes('remote'))
-    )
-  })
+        if (categories.length === 0) {
+          const categoriesData = await fetchCategories()
+          setCategories(['All', ...categoriesData])
+        }
+      } catch (err) {
+        setError(err.message || 'An unknown error occurred')
+        console.error('Error fetching data:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  const resetFilters = () => {
+    const debounceTimer = setTimeout(fetchData, 500)
+    return () => clearTimeout(debounceTimer)
+  }, [filters.search, filters.category, categories.length])
+
+ 
+
+  const jobTypes = ['All', 'Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship']
+
+  const filteredJobs = jobs.filter(job => (
+    (filters.jobType === 'All' || job.job_type === filters.jobType) &&
+    (!filters.remoteOnly || (job.location && job.location.toLowerCase().includes('remote')))
+  ))
+  
+  function resetFilters() {
     setFilters({
       search: '',
       jobType: 'All',
       category: 'All',
-      remoteOnly: false
+      remoteOnly: true
     })
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h3 className="text-lg font-medium text-red-500">Error loading jobs</h3>
+        <p className="text-gray-500 mt-2">{error}</p>
+        <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -144,20 +159,41 @@ function Jobcard() {
       </div>
 
       {/* Job Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map((job) => (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-5 w-16" />
+                </div>
+                <Skeleton className="h-4 w-3/4" />
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-9 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : filteredJobs.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredJobs.map((job) => (
             <Card key={job.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="text-lg">{job.title}</CardTitle>
                 <CardDescription className="font-medium">
-                  {job.company}
+                  {job.company_name}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    {job.type}
+                    {job.job_type}
                   </span>
                   <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
                     {job.category}
@@ -172,22 +208,22 @@ function Jobcard() {
                 </div>
               </CardContent>
               <CardFooter>
-                <JobDetailsModal>
+                <JobDetailsModal  jobId={job.id}>
                   <Button className="w-full">View Details</Button>
                 </JobDetailsModal>
               </CardFooter>
             </Card>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <h3 className="text-lg font-medium">No jobs found</h3>
-            <p className="text-gray-500 mt-2">Try adjusting your search filters</p>
-            <Button variant="outline" className="mt-4" onClick={resetFilters}>
-              Reset filters
-            </Button>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="col-span-full text-center py-12">
+          <h3 className="text-lg font-medium">No jobs found</h3>
+          <p className="text-gray-500 mt-2">Try adjusting your search filters</p>
+          <Button variant="outline" className="mt-4" onClick={resetFilters}>
+            Reset filters
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
