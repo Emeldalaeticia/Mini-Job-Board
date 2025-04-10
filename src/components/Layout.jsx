@@ -10,7 +10,7 @@ function Layout({ children }) {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Black sticky header */}
+         
           <header className="sticky top-0 z-50 bg-black text-white p-4 flex items-center justify-between">
             <div className="flex items-center">
               <SidebarTrigger className="text-white hover:bg-gray-800" />

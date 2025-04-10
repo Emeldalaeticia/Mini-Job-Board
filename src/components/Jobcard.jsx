@@ -8,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Search, X } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { fetchJobs, fetchCategories } from "@/components/services/api";
-import JobList from './JobList'; // Import the new component
+import JobList from './JobList'; 
 
 function Jobcard() {
   const [filters, setFilters] = useState({

@@ -34,7 +34,7 @@ const formSchema = z.object({
   companyName: z.string().min(2, {
     message: "Company name must be at least 2 characters.",
   }),
-  jobType: z.string(), // No enum needed in JS
+  jobType: z.string(), // No enum needed 
   location: z.string().min(2, {
     message: "Location must be at least 2 characters.",
   }),
