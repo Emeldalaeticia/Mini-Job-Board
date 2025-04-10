@@ -40,8 +40,11 @@ function Jobcard() {
           ...(filters.category !== 'All' && { category: filters.category.toLowerCase() }),
           ...(filters.remoteOnly && { location: 'remote' }) // Add remote filter to API call
         })
+        
+        // Debug log to see what jobs are being fetched
+       
         setJobs(jobsData.jobs)
-
+  
         if (categories.length === 0) {
           const categoriesData = await fetchCategories()
           setCategories(['All', ...categoriesData])
@@ -53,11 +56,10 @@ function Jobcard() {
         setIsLoading(false)
       }
     }
-
+  
     const debounceTimer = setTimeout(fetchData, 500)
     return () => clearTimeout(debounceTimer)
   }, [filters.search, filters.category, filters.remoteOnly, categories.length])
-
   const jobTypes = [
     { value: 'All', label: 'All' },
     { value: 'full_time', label: 'Full-time' },
@@ -75,7 +77,7 @@ function Jobcard() {
     (filters.jobType === 'All' || job.job_type === filters.jobType) &&
     (!filters.remoteOnly || (job.location && job.location.toLowerCase().includes('remote')))
   ))
-  
+
   const resetFilters = () => {
     setFilters({
       search: '',
@@ -174,11 +176,14 @@ function Jobcard() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardHeader>
+           <Card key={i}>
+           <CardHeader className="flex flex-row items-start gap-4">
+             <Skeleton className="w-12 h-12 rounded-md" />
+             <div>
+               <Skeleton className="h-6 w-3/4" />
+               <Skeleton className="h-4 w-1/2 mt-2" />
+             </div>
+           </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-2">
                   <Skeleton className="h-5 w-16" />
@@ -195,13 +200,26 @@ function Jobcard() {
       ) : filteredJobs.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-            <Card key={job.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">{job.title}</CardTitle>
-                <CardDescription className="font-medium">
-                  {job.company_name}
-                </CardDescription>
-              </CardHeader>
+  <Card key={job.id} className="hover:shadow-lg transition-shadow">
+    <CardHeader className="flex flex-row items-start gap-4">
+      {/* Company Logo */}
+      {job.company_logo && (
+        <img 
+          src={job.company_logo} 
+          alt={`${job.company_name} logo`}
+          className="w-12 h-12 object-contain rounded-md border"
+          onError={(e) => {
+            e.target.style.display = 'none'; // Hide if image fails to load
+          }}
+        />
+      )}
+      <div>
+        <CardTitle className="text-lg">{job.title}</CardTitle>
+        <CardDescription className="font-medium">
+          {job.company_name}
+        </CardDescription>
+      </div>
+    </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
