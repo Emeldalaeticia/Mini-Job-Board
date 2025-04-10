@@ -69,8 +69,11 @@ function Jobcard() {
 
   // Client-side filtering (only for job type now since others are handled by API)
   const filteredJobs = jobs.filter(job => (
-    filters.jobType === 'All' || 
-    job.job_type.toLowerCase() === filters.jobType.toLowerCase()
+    (filters.search === '' || 
+     job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+     (job.company_name && job.company_name.toLowerCase().includes(filters.search.toLowerCase()))) &&
+    (filters.jobType === 'All' || job.job_type === filters.jobType) &&
+    (!filters.remoteOnly || (job.location && job.location.toLowerCase().includes('remote')))
   ))
   
   const resetFilters = () => {

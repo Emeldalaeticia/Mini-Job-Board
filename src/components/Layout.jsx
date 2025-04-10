@@ -5,15 +5,16 @@ import AppSidebar from './AppSidebar'
 function Layout({ children }) {
   return (
     <SidebarProvider>
-        <div className="flex h-screen">
+      <div className="flex h-screen w-full">
         <AppSidebar />
-        
-       
-     
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="p-4">
+            <SidebarTrigger />
+          </div>
+          <main className="flex-1 overflow-auto p-4">
+            {children}
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   )

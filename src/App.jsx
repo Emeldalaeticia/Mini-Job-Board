@@ -9,15 +9,8 @@ function App() {
 
   return (
     <>
-    
       <Layout>
-
-    
- 
-      <div className=" ">
-       <Jobcard/>   
-    </div>
-
+      <Jobcard />
     </Layout>
     </>
   )
