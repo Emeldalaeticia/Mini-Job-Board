@@ -22,11 +22,11 @@ import {
 } from "@/components/ui/select";
 import Layout from './Layout';
 
-// Define job types and categories as arrays
+//  job types and categories as arrays
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship", "Temporary"];
 const categories = ["Technology", "Healthcare", "Finance", "Education", "Marketing", "Other"];
 
-// 1. Define the form schema using Zod 
+//  the form schema using Zod 
 const formSchema = z.object({
   jobTitle: z.string().min(2, {
     message: "Job title must be at least 2 characters.",
@@ -42,7 +42,7 @@ const formSchema = z.object({
 });
 
 function AddJobForm() {
-  // 2. Define the form (no type annotations)
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,7 +54,7 @@ function AddJobForm() {
     },
   });
 
-  // 3. Define the submit handler
+  // the submit handler
   function onSubmit(values) {
     console.log(values);
     alert(JSON.stringify(values, null, 2));
