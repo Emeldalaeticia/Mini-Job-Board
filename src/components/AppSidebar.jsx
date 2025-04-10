@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
   import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+  import { Link } from 'react-router-dom'
  
 
 function AppSidebar() {
@@ -17,12 +18,12 @@ function AppSidebar() {
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
+    title: "Add Job",
+    url: "/addjob",
     icon: Inbox,
   },
   {
@@ -46,18 +47,23 @@ const items = [
     <Sidebar>
     <SidebarContent>
       <SidebarGroup>
+        <Link to="/">
         <SidebarGroupLabel>Job Board</SidebarGroupLabel>
+        </Link>
         <SidebarGroupContent>
           <SidebarMenu>
             {items.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+             <SidebarMenuItem key={item.title}>
+             <SidebarMenuButton 
+               asChild 
+               active={location.pathname === item.url}
+             >
+               <Link to={item.url}>
+                 <item.icon className="w-5 h-5" />
+                 <span>{item.title}</span>
+               </Link>
+             </SidebarMenuButton>
+           </SidebarMenuItem>
             ))}
           </SidebarMenu>
         </SidebarGroupContent>

@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Layout from './Layout';
 
 // Define job types and categories as arrays
 const jobTypes = ["Full-time", "Part-time", "Contract", "Internship", "Temporary"];
@@ -60,7 +61,9 @@ function AddJobForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+    <>
+    <Layout>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
       <h1 className="text-2xl font-bold mb-6 text-center">Post a Job</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -165,6 +168,8 @@ function AddJobForm() {
         </form>
       </Form>
     </div>
+    </Layout>
+    </>
   );
 }
 
