@@ -10,7 +10,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchJobById } from "@/components/services/api";
 
-function JobDetailsModal({ jobId }) {
+const JobDetailsModal = ({ jobId }) => {
   const [jobDetails, setJobDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

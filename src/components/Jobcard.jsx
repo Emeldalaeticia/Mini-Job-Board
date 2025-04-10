@@ -20,7 +20,7 @@ function Jobcard() {
     search: '',
     jobType: 'All',
     category: 'All',
-    remoteOnly: true
+    remoteOnly: false // Changed initial state to false
   })
 
   const [jobs, setJobs] = useState([])
@@ -34,11 +34,11 @@ function Jobcard() {
       setError(null)
       
       try {
-        // Use the API service functions
         const jobsData = await fetchJobs({
           limit: 21,
           ...(filters.search && { search: filters.search }),
-          ...(filters.category !== 'All' && { category: filters.category.toLowerCase() })
+          ...(filters.category !== 'All' && { category: filters.category.toLowerCase() }),
+          ...(filters.remoteOnly && { location: 'remote' }) // Add remote filter to API call
         })
         setJobs(jobsData.jobs)
 
@@ -56,23 +56,29 @@ function Jobcard() {
 
     const debounceTimer = setTimeout(fetchData, 500)
     return () => clearTimeout(debounceTimer)
-  }, [filters.search, filters.category, categories.length])
+  }, [filters.search, filters.category, filters.remoteOnly, categories.length])
 
- 
+  const jobTypes = [
+    { value: 'All', label: 'All' },
+    { value: 'full_time', label: 'Full-time' },
+    { value: 'part_time', label: 'Part-time' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'freelance', label: 'Freelance' },
+    { value: 'internship', label: 'Internship' }
+  ];
 
-  const jobTypes = ['All', 'Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship']
-
+  // Client-side filtering (only for job type now since others are handled by API)
   const filteredJobs = jobs.filter(job => (
-    (filters.jobType === 'All' || job.job_type === filters.jobType) &&
-    (!filters.remoteOnly || (job.location && job.location.toLowerCase().includes('remote')))
+    filters.jobType === 'All' || 
+    job.job_type.toLowerCase() === filters.jobType.toLowerCase()
   ))
   
-  function resetFilters() {
+  const resetFilters = () => {
     setFilters({
       search: '',
       jobType: 'All',
       category: 'All',
-      remoteOnly: true
+      remoteOnly: false
     })
   }
 
@@ -106,18 +112,21 @@ function Jobcard() {
 
           {/* Job Type Filter */}
           <Select 
-            value={filters.jobType} 
-            onValueChange={(value) => setFilters({...filters, jobType: value})}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Job Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {jobTypes.map((type) => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    value={filters.jobType} 
+    onValueChange={(value) => setFilters({...filters, jobType: value})}
+  >
+    <SelectTrigger className="w-[180px]">
+      <SelectValue placeholder="Job Type" />
+    </SelectTrigger>
+    <SelectContent>
+      {jobTypes.map((type) => (
+        <SelectItem key={type.value} value={type.value}>
+          {type.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+
 
           {/* Category Filter */}
           <Select 
@@ -208,7 +217,7 @@ function Jobcard() {
                 </div>
               </CardContent>
               <CardFooter>
-                <JobDetailsModal  jobId={job.id}>
+                <JobDetailsModal jobId={job.id}>
                   <Button className="w-full">View Details</Button>
                 </JobDetailsModal>
               </CardFooter>

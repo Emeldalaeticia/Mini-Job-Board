@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import JobDetailsModal from "./components/JobDetailsModal";
 import './App.css'
 import Layout from "./components/Layout";
+import Jobcard from "./components/Jobcard";
 
 function App() {
  
@@ -13,8 +14,8 @@ function App() {
 
     
  
-      <div className="flex flex-col items-center justify-center min-h-screen">
-       <JobDetailsModal/>   
+      <div className=" ">
+       <Jobcard/>   
     </div>
 
     </Layout>

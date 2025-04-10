@@ -17,7 +17,14 @@ export function JobFilters({ filters, setFilters }) {
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const [categoriesError, setCategoriesError] = useState(null)
 
-  const jobTypes = ["All", "full_time", "part_time", "contract", "internship"]
+  // Define job types with proper display names
+  const jobTypes = [
+    { value: "All", label: "All" },
+    { value: "full_time", label: "Full-time" },
+    { value: "part_time", label: "Part-time" },
+    { value: "contract", label: "Contract" },
+    { value: "internship", label: "Internship" }
+  ]
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -42,15 +49,24 @@ export function JobFilters({ filters, setFilters }) {
       search: '',
       jobType: 'All',
       category: 'All',
-      remoteOnly: false // Changed default to false
+      remoteOnly: false
     })
   }
 
-  // Convert category name to API-friendly slug format
   const handleCategoryChange = (value) => {
     setFilters({
       ...filters,
       category: value === 'All' ? 'All' : value.toLowerCase().replace(/\s+/g, '-')
+    })
+  }
+
+  const handleRemoteOnlyChange = (checked) => {
+    // The checked parameter might be a boolean or a string "indeterminate"
+    // We need to ensure we only use boolean values
+    const isChecked = checked === true;
+    setFilters({
+      ...filters,
+      remoteOnly: isChecked
     })
   }
 
@@ -81,7 +97,9 @@ export function JobFilters({ filters, setFilters }) {
             </SelectTrigger>
             <SelectContent>
               {jobTypes.map((type) => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -113,17 +131,14 @@ export function JobFilters({ filters, setFilters }) {
           )}
         </div>
 
-        {/* Remote Only Toggle - Fixed boolean handling */}
+        {/* Remote Only Toggle */}
         <div className="flex items-center space-x-2">
           <Checkbox 
-            id="remote-only" 
-            checked={filters.remoteOnly}
-            onCheckedChange={(checked) => setFilters({
-              ...filters, 
-              remoteOnly: !!checked // Ensure boolean value
-            })}
+            id="remote-only"
+            checked={filters.remoteOnly || false} // Fallback to false if undefined
+            onCheckedChange={handleRemoteOnlyChange}
           />
-          <label htmlFor="remote-only" className="text-sm font-medium">
+          <label htmlFor="remote-only" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Remote only
           </label>
         </div>

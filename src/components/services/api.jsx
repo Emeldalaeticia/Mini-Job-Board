@@ -69,9 +69,18 @@ export const fetchJobById = async (jobId) => {
     
     // If not found in first 100, try a more precise search
     const response = await fetch(`${BASE_URL}?id=${jobId}`);
-    if (!response.ok) throw new Error('Job not found');
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`Job with ID ${jobId} not found`);
+      } else {
+        throw new Error(`Failed to fetch job with ID ${jobId}: ${response.status}`);
+      }
+    }
     
     const data = await response.json();
+    if (!data.jobs || !Array.isArray(data.jobs) || data.jobs.length !== 1) {
+      throw new Error(`Invalid response data structure for job with ID ${jobId}`);
+    }
     return data.jobs[0];
     
   } catch (error) {
